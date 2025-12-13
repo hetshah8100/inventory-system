@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Shopkeeper – Add Stock</h2>
+
+<form method="post">
+    Date:
+    <input type="date" name="date" required><br><br>
+
+    Store:
+    <select name="store" required>
+        {% for s in stores %}
+            <option>{{ s[0] }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    Category:
+    <select name="category" required>
+        {% for c in categories %}
+            <option>{{ c[0] }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    Product:
+    <input name="product" required><br><br>
+
+    Quantity:
+    <input type="number" name="quantity" required><br><br>
+
+    Entered By:
+    <input name="entered_by" required><br><br>
+
+    <button type="submit">Save Stock</button>
+</form>
+
+<hr>
+
+<a href="/supervisor">Supervisor View</a> |
+<a href="/stores">Manage Stores & Categories</a>
+
+</body>
+</html>
