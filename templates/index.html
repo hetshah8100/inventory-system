@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inventory System</title>
+</head>
+<body>
+<h2>Add Product</h2>
+
+<form method="post">
+    Product: <input name="product" required><br><br>
+    Quantity: <input name="quantity" type="number" required><br><br>
+
+    Store:
+    <select name="store" required>
+        {% for s in stores %}
+        <option value="{{ s[0] }}">{{ s[1] }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    Category:
+    <select name="category" required>
+        {% for c in categories %}
+        <option value="{{ c[0] }}">{{ c[1] }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    Entered By: <input name="entered_by" required><br><br>
+
+    <button>Add</button>
+</form>
+
+<hr>
+<a href="/supervisor">Supervisor Page</a> |
+<a href="/stores">Manage Stores</a> |
+<a href="/categories">Manage Categories</a>
+</body>
+</html>
