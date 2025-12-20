@@ -13,7 +13,8 @@
     <select name="category">
         <option value="">All Categories</option>
         {% for c in categories %}
-            <option value="{{ c }}" {% if c == selected_category %}selected{% endif %}>
+            <option value="{{ c }}"
+                {% if c == selected_category %}selected{% endif %}>
                 {{ c }}
             </option>
         {% endfor %}
@@ -36,18 +37,18 @@
 
     {% for p in products %}
     <tr>
-        <td>{{ p[1].strftime("%Y-%m-%d %H:%M") }}</td>
+        <!-- FIX IS HERE: p[0] is date -->
+        <td>{{ p[0] }}</td>
+        <td>{{ p[1] }}</td>
         <td>{{ p[2] }}</td>
         <td>{{ p[3] }}</td>
         <td>{{ p[4] }}</td>
         <td>{{ p[5] }}</td>
-        <td>{{ p[6] }}</td>
     </tr>
     {% endfor %}
 </table>
 
 <br>
-
 <a href="/">Back to Shopkeeper</a>
 
 </body>
