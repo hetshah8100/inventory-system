@@ -1,30 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Manage Stores</title>
-</head>
-<body>
-
-<h2>Manage Stores</h2>
+<h1>Manage Stores</h1>
 
 <form method="POST">
-  New Store:
-  <input type="text" name="name" required>
-  <button type="submit">Add Store</button>
+New Store: <input name="name">
+<button>Add</button>
 </form>
 
-<table border="1">
-<tr><th>Store</th><th>Action</th></tr>
+<ul>
 {% for s in stores %}
-<tr>
-  <td>{{ s[1] }}</td>
-  <td><a href="/delete_store/{{ s[0] }}">Delete</a></td>
-</tr>
+<li>
+{{ s[0] }} —
+<a href="/store/{{ s[0] }}">View Products</a>
+</li>
 {% endfor %}
-</table>
+</ul>
 
-<br>
-<a href="/supervisor">Back</a>
-
-</body>
-</html>
+<a href="/">Back to Shopkeeper</a>
