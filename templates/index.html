@@ -1,37 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Inventory System</title>
+  <title>Inventory System</title>
 </head>
 <body>
+
 <h2>Add Product</h2>
 
-<form method="post">
-    Product: <input name="product" required><br><br>
-    Quantity: <input name="quantity" type="number" required><br><br>
+<form method="POST">
+  Product:
+  <input type="text" name="product" required><br><br>
 
-    Store:
-    <select name="store" required>
-        {% for s in stores %}
-        <option value="{{ s[0] }}">{{ s[1] }}</option>
-        {% endfor %}
-    </select><br><br>
+  Quantity:
+  <input type="number" name="quantity" required><br><br>
 
-    Category:
-    <select name="category" required>
-        {% for c in categories %}
-        <option value="{{ c[0] }}">{{ c[1] }}</option>
-        {% endfor %}
-    </select><br><br>
+  Store:
+  <select name="store" required>
+    {% for s in stores %}
+      <option value="{{ s[0] }}">{{ s[1] }}</option>
+    {% endfor %}
+  </select><br><br>
 
-    Entered By: <input name="entered_by" required><br><br>
+  Category:
+  <select name="category" required>
+    {% for c in categories %}
+      <option value="{{ c[0] }}">{{ c[1] }}</option>
+    {% endfor %}
+  </select><br><br>
 
-    <button>Add</button>
+  Entered By:
+  <input type="text" name="entered_by" required><br><br>
+
+  <button type="submit">Add</button>
 </form>
 
 <hr>
-<a href="/supervisor">Supervisor Page</a> |
-<a href="/stores">Manage Stores</a> |
-<a href="/categories">Manage Categories</a>
+
+{% if products %}
+<h3>Items for Selected Store</h3>
+
+<table border="1">
+  <tr>
+    <th>Date</th>
+    <th>Store</th>
+    <th>Category</th>
+    <th>Product</th>
+    <th>Qty</th>
+    <th>Entered By</th>
+  </tr>
+  {% for p in products %}
+  <tr>
+    <td>{{ p[0] }}</td>
+    <td>{{ p[1] }}</td>
+    <td>{{ p[2] }}</td>
+    <td>{{ p[3] }}</td>
+    <td>{{ p[4] }}</td>
+    <td>{{ p[5] }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+<hr>
+
+<a href="/supervisor">Supervisor Page</a>
+
 </body>
 </html>
+
