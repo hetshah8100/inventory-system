@@ -1,45 +1,53 @@
-<h1>Add Product</h1>
+<h2>Shopkeeper</h2>
 
-<form method="POST">
-Product: <input name="product"><br><br>
-Quantity: <input name="quantity" type="number"><br><br>
-
-Store:
-<select name="store">
-{% for s in stores %}
-<option>{{ s[0] }}</option>
-{% endfor %}
-</select><br><br>
-
-Category:
-<select name="category">
-{% for c in categories %}
-<option>{{ c[0] }}</option>
-{% endfor %}
-</select><br><br>
-
-Entered By: <input name="entered_by"><br><br>
-<button>Add</button>
+<form method="get">
+    <select name="store" required>
+        <option value="">Select Store</option>
+        {% for s in stores %}
+        <option value="{{ s }}" {% if s == selected_store %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select>
+    <button>Select</button>
 </form>
 
+{% if selected_store %}
 <hr>
 
-<a href="/stores">Manage Stores</a> |
-<a href="/categories">Manage Categories</a> |
-<a href="/supervisor">Supervisor Page</a>
+<form method="post">
+    <input type="hidden" name="store" value="{{ selected_store }}">
 
-<hr>
+    <select name="category" required>
+        {% for c in categories %}
+        <option>{{ c }}</option>
+        {% endfor %}
+    </select>
 
-<h2>Recent Entries</h2>
-<ul>
+    <input name="product" placeholder="Product" required>
+    <input name="quantity" type="number" required>
+    <input name="entered_by" placeholder="Entered by" required>
+
+    <button>Add</button>
+</form>
+
+<h3>{{ selected_store }} Inventory</h3>
+
+<table border="1">
+<tr>
+    <th>Date</th><th>Category</th><th>Product</th><th>Qty</th><th>Entered By</th>
+</tr>
 {% for p in products %}
-<li>
-{{ p[0] }}<br>
-<b>Store:</b> {{ p[1] }}<br>
-<b>Category:</b> {{ p[2] }}<br>
-<b>Product:</b> {{ p[3] }}<br>
-<b>Qty:</b> {{ p[4] }}<br>
-<b>By:</b> {{ p[5] }}
-</li><br>
+<tr>
+    <td>{{ p[1] }}</td>
+    <td>{{ p[2] }}</td>
+    <td>{{ p[3] }}</td>
+    <td>{{ p[4] }}</td>
+    <td>{{ p[5] }}</td>
+</tr>
 {% endfor %}
-</ul>
+</table>
+{% endif %}
+
+<hr>
+<a href="/supervisor">Supervisor</a> |
+<a href="/stores">Manage Stores</a> |
+<a href="/categories">Manage Categories</a>
