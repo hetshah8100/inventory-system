@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Categories</title>
+</head>
+<body>
+
+<h2>Manage Categories</h2>
+
+<form method="POST">
+  New Category:
+  <input type="text" name="name" required>
+  <button type="submit">Add Category</button>
+</form>
+
+<table border="1">
+<tr><th>Category</th><th>Action</th></tr>
+{% for c in categories %}
+<tr>
+  <td>{{ c[1] }}</td>
+  <td><a href="/delete_category/{{ c[0] }}">Delete</a></td>
+</tr>
+{% endfor %}
+</table>
+
+<br>
+<a href="/supervisor">Back</a>
+
+</body>
+</html>
