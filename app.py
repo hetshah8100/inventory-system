@@ -1,62 +1,29 @@
-from flask import Flask, render_template, request, redirect, url_for
-import os
+from flask import Flask, render_template, request, redirect
 import psycopg
+import os
 
 app = Flask(__name__)
 
-# =========================
-# DATABASE CONNECTION
-# =========================
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 def db():
     return psycopg.connect(DATABASE_URL)
 
-# =========================
-# AUTO CREATE TABLES
-# =========================
-def init_db():
-    with db() as con:
-        cur = con.cursor()
-
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS stores (
-            id SERIAL PRIMARY KEY,
-            name TEXT UNIQUE NOT NULL
-        );
-        """)
-
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS categories (
-            id SERIAL PRIMARY KEY,
-            name TEXT UNIQUE NOT NULL
-        );
-        """)
-
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS inventory (
-            id SERIAL PRIMARY KEY,
-            product TEXT NOT NULL,
-            quantity INTEGER NOT NULL,
-            store_id INTEGER REFERENCES stores(id),
-            category_id INTEGER REFERENCES categories(id),
-            entered_by TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-        """)
-
-        con.commit()
-
-# =========================
-# ROUTES
-# =========================
-
+# ---------------- HOME (SHOPKEEPER) ----------------
 @app.route("/", methods=["GET", "POST"])
 def add_stock():
+    products = []
+    selected_store = None
+
     with db() as con:
         cur = con.cursor()
 
-        # Add product
+        cur.execute("SELECT id, name FROM stores ORDER BY name")
+        stores = cur.fetchall()
+
+        cur.execute("SELECT id, name FROM categories ORDER BY name")
+        categories = cur.fetchall()
+
         if request.method == "POST":
             product = request.form["product"]
             quantity = request.form["quantity"]
@@ -65,60 +32,62 @@ def add_stock():
             entered_by = request.form["entered_by"]
 
             cur.execute("""
-                INSERT INTO inventory (product, quantity, store_id, category_id, entered_by)
+                INSERT INTO products (product, quantity, store_id, category_id, entered_by)
                 VALUES (%s, %s, %s, %s, %s)
             """, (product, quantity, store_id, category_id, entered_by))
 
             con.commit()
-            return redirect(url_for("add_stock"))
+            selected_store = store_id
 
-        # Fetch stores & categories
-        cur.execute("SELECT id, name FROM stores ORDER BY name")
-        stores = cur.fetchall()
+        if selected_store:
+            cur.execute("""
+                SELECT p.created_at, s.name, c.name, p.product, p.quantity, p.entered_by
+                FROM products p
+                JOIN stores s ON p.store_id = s.id
+                JOIN categories c ON p.category_id = c.id
+                WHERE s.id = %s
+                ORDER BY p.created_at DESC
+            """, (selected_store,))
+            products = cur.fetchall()
 
-        cur.execute("SELECT id, name FROM categories ORDER BY name")
-        categories = cur.fetchall()
+    return render_template(
+        "index.html",
+        stores=stores,
+        categories=categories,
+        products=products
+    )
 
-    return render_template("index.html", stores=stores, categories=categories)
-
-
+# ---------------- SUPERVISOR ----------------
 @app.route("/supervisor")
 def supervisor():
     with db() as con:
         cur = con.cursor()
-
         cur.execute("""
-            SELECT inventory.id, product, quantity,
-                   stores.name AS store,
-                   categories.name AS category,
-                   entered_by, created_at
-            FROM inventory
-            LEFT JOIN stores ON inventory.store_id = stores.id
-            LEFT JOIN categories ON inventory.category_id = categories.id
-            ORDER BY created_at DESC
+            SELECT p.created_at, s.name, c.name, p.product, p.quantity, p.entered_by
+            FROM products p
+            JOIN stores s ON p.store_id = s.id
+            JOIN categories c ON p.category_id = c.id
+            ORDER BY p.created_at DESC
         """)
+        products = cur.fetchall()
 
-        items = cur.fetchall()
+    return render_template("supervisor.html", products=products)
 
-    return render_template("supervisor.html", items=items)
-
-
+# ---------------- STORES ----------------
 @app.route("/stores", methods=["GET", "POST"])
-def manage_stores():
+def stores():
     with db() as con:
         cur = con.cursor()
 
         if request.method == "POST":
             name = request.form["name"]
-            cur.execute("INSERT INTO stores (name) VALUES (%s) ON CONFLICT DO NOTHING", (name,))
+            cur.execute("INSERT INTO stores (name) VALUES (%s)", (name,))
             con.commit()
-            return redirect(url_for("manage_stores"))
 
         cur.execute("SELECT id, name FROM stores ORDER BY name")
         stores = cur.fetchall()
 
     return render_template("stores.html", stores=stores)
-
 
 @app.route("/delete_store/<int:id>")
 def delete_store(id):
@@ -126,25 +95,23 @@ def delete_store(id):
         cur = con.cursor()
         cur.execute("DELETE FROM stores WHERE id = %s", (id,))
         con.commit()
-    return redirect(url_for("manage_stores"))
+    return redirect("/stores")
 
-
+# ---------------- CATEGORIES ----------------
 @app.route("/categories", methods=["GET", "POST"])
-def manage_categories():
+def categories():
     with db() as con:
         cur = con.cursor()
 
         if request.method == "POST":
             name = request.form["name"]
-            cur.execute("INSERT INTO categories (name) VALUES (%s) ON CONFLICT DO NOTHING", (name,))
+            cur.execute("INSERT INTO categories (name) VALUES (%s)", (name,))
             con.commit()
-            return redirect(url_for("manage_categories"))
 
         cur.execute("SELECT id, name FROM categories ORDER BY name")
         categories = cur.fetchall()
 
     return render_template("categories.html", categories=categories)
-
 
 @app.route("/delete_category/<int:id>")
 def delete_category(id):
@@ -152,22 +119,7 @@ def delete_category(id):
         cur = con.cursor()
         cur.execute("DELETE FROM categories WHERE id = %s", (id,))
         con.commit()
-    return redirect(url_for("manage_categories"))
-
-
-@app.route("/clear_inventory")
-def clear_inventory():
-    with db() as con:
-        cur = con.cursor()
-        cur.execute("DELETE FROM inventory")
-        con.commit()
-    return redirect(url_for("supervisor"))
-
-# =========================
-# STARTUP
-# =========================
-init_db()
+    return redirect("/categories")
 
 if __name__ == "__main__":
     app.run()
-
