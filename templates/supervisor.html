@@ -1,38 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Supervisor</title>
-</head>
-<body>
+<h1>Supervisor View</h1>
 
-<h2>Supervisor View</h2>
+<ul>
+{% for p in products %}
+<li>
+{{ p[0] }}<br>
+Store: {{ p[1] }}<br>
+Category: {{ p[2] }}<br>
+Product: {{ p[3] }}<br>
+Qty: {{ p[4] }}<br>
+By: {{ p[5] }}
+</li><br>
+{% endfor %}
+</ul>
 
-<a href="/stores">Manage Stores</a> |
-<a href="/categories">Manage Categories</a> |
 <a href="/">Back to Shopkeeper</a>
-
-<hr>
-
-<table border="1">
-  <tr>
-    <th>Date</th>
-    <th>Store</th>
-    <th>Category</th>
-    <th>Product</th>
-    <th>Qty</th>
-    <th>Entered By</th>
-  </tr>
-  {% for p in products %}
-  <tr>
-    <td>{{ p[0] }}</td>
-    <td>{{ p[1] }}</td>
-    <td>{{ p[2] }}</td>
-    <td>{{ p[3] }}</td>
-    <td>{{ p[4] }}</td>
-    <td>{{ p[5] }}</td>
-  </tr>
-  {% endfor %}
-</table>
-
-</body>
-</html>
