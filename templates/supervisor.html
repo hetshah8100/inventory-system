@@ -1,35 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Supervisor</title>
+  <title>Supervisor</title>
 </head>
 <body>
-<h2>Inventory</h2>
+
+<h2>Supervisor View</h2>
+
+<a href="/stores">Manage Stores</a> |
+<a href="/categories">Manage Categories</a> |
+<a href="/">Back to Shopkeeper</a>
+
+<hr>
 
 <table border="1">
-<tr>
-    <th>Product</th>
-    <th>Qty</th>
+  <tr>
+    <th>Date</th>
     <th>Store</th>
     <th>Category</th>
+    <th>Product</th>
+    <th>Qty</th>
     <th>Entered By</th>
-    <th>Date</th>
-</tr>
-
-{% for i in items %}
-<tr>
-    <td>{{ i[1] }}</td>
-    <td>{{ i[2] }}</td>
-    <td>{{ i[3] }}</td>
-    <td>{{ i[4] }}</td>
-    <td>{{ i[5] }}</td>
-    <td>{{ i[6] }}</td>
-</tr>
-{% endfor %}
+  </tr>
+  {% for p in products %}
+  <tr>
+    <td>{{ p[0] }}</td>
+    <td>{{ p[1] }}</td>
+    <td>{{ p[2] }}</td>
+    <td>{{ p[3] }}</td>
+    <td>{{ p[4] }}</td>
+    <td>{{ p[5] }}</td>
+  </tr>
+  {% endfor %}
 </table>
 
-<br>
-<a href="/clear_inventory">Clear All Inventory</a><br><br>
-<a href="/">Back</a>
 </body>
 </html>
