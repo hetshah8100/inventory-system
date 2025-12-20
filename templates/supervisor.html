@@ -1,16 +1,31 @@
-<h1>Supervisor View</h1>
+<h2>Supervisor</h2>
 
-<ul>
+<table border="1">
+<tr>
+    <th>Date</th><th>Store</th><th>Category</th><th>Product</th>
+    <th>Qty</th><th>Entered By</th><th>Actions</th>
+</tr>
+
 {% for p in products %}
-<li>
-{{ p[0] }}<br>
-Store: {{ p[1] }}<br>
-Category: {{ p[2] }}<br>
-Product: {{ p[3] }}<br>
-Qty: {{ p[4] }}<br>
-By: {{ p[5] }}
-</li><br>
+<tr>
+    <td>{{ p[1] }}</td>
+    <td>{{ p[2] }}</td>
+    <td>{{ p[3] }}</td>
+    <td>{{ p[4] }}</td>
+    <td>{{ p[5] }}</td>
+    <td>{{ p[6] }}</td>
+    <td>
+        <a href="/edit/{{ p[0] }}">Edit</a> |
+        <a href="/delete/{{ p[0] }}" onclick="return confirm('Delete?')">Delete</a>
+    </td>
+</tr>
 {% endfor %}
-</ul>
+</table>
 
-<a href="/">Back to Shopkeeper</a>
+<br>
+<a href="/clear_inventory" onclick="return confirm('Clear ALL inventory?')">
+<button>Clear Inventory</button>
+</a>
+
+<hr>
+<a href="/">Shopkeeper</a>
