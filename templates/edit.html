@@ -1,56 +1,16 @@
-<!DOCTYPE html>
-<html>
-<body>
-
-<h2>Edit Inventory Item</h2>
+<h2>Edit Product</h2>
 
 <form method="post">
-
-    Date:
-    <input type="date" name="date" value="{{ row[1] }}" required>
-    <br><br>
-
-    Store:
-    <select name="store" required>
-        {% for s in stores %}
-            <option value="{{ s[0] }}"
-                {% if s[0] == row[2] %}selected{% endif %}>
-                {{ s[0] }}
-            </option>
-        {% endfor %}
-    </select>
-    <br><br>
-
-    Category:
-    <select name="category" required>
+    <select name="category">
         {% for c in categories %}
-            <option value="{{ c[0] }}"
-                {% if c[0] == row[4] %}selected{% endif %}>
-                {{ c[0] }}
-            </option>
+        <option {% if c == product[1] %}selected{% endif %}>{{ c }}</option>
         {% endfor %}
     </select>
-    <br><br>
 
-    Product:
-    <input type="text" name="product" value="{{ row[3] }}" required>
-    <br><br>
+    <input name="product" value="{{ product[2] }}">
+    <input name="quantity" type="number" value="{{ product[3] }}">
 
-    Quantity:
-    <input type="number" name="quantity" value="{{ row[5] }}" required>
-    <br><br>
-
-    Entered By:
-    <input type="text" name="entered_by" value="{{ row[6] }}" required>
-    <br><br>
-
-    <button type="submit">Update</button>
-
+    <button>Update</button>
 </form>
 
-<br>
-
-<a href="/supervisor">Cancel / Back</a>
-
-</body>
-</html>
+<a href="/supervisor">Back</a>
