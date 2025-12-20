@@ -1,55 +1,30 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <title>Manage Stores</title>
+</head>
 <body>
 
 <h2>Manage Stores</h2>
 
-<form method="post">
-    <input type="hidden" name="type" value="store">
-    New Store:
-    <input name="name" required>
-    <button>Add Store</button>
+<form method="POST">
+  New Store:
+  <input type="text" name="name" required>
+  <button type="submit">Add Store</button>
 </form>
 
-<table border="1" cellpadding="6">
+<table border="1">
 <tr><th>Store</th><th>Action</th></tr>
 {% for s in stores %}
 <tr>
-    <td>{{ s[1] }}</td>
-    <td>
-        <a href="/delete_store/{{ s[0] }}"
-           onclick="return confirm('Delete store?')">Delete</a>
-    </td>
-</tr>
-{% endfor %}
-</table>
-
-<hr>
-
-<h2>Manage Categories</h2>
-
-<form method="post">
-    <input type="hidden" name="type" value="category">
-    New Category:
-    <input name="name" required>
-    <button>Add Category</button>
-</form>
-
-<table border="1" cellpadding="6">
-<tr><th>Category</th><th>Action</th></tr>
-{% for c in categories %}
-<tr>
-    <td>{{ c[1] }}</td>
-    <td>
-        <a href="/delete_category/{{ c[0] }}"
-           onclick="return confirm('Delete category?')">Delete</a>
-    </td>
+  <td>{{ s[1] }}</td>
+  <td><a href="/delete_store/{{ s[0] }}">Delete</a></td>
 </tr>
 {% endfor %}
 </table>
 
 <br>
-<a href="/">Back to Shopkeeper</a>
+<a href="/supervisor">Back</a>
 
 </body>
 </html>
