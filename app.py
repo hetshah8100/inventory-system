@@ -10,7 +10,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 def db():
     return psycopg.connect(DATABASE_URL)
 
-# ---------- DATABASE SETUP ----------
+# ---------- DATABASE INIT ----------
 def init_db():
     with db() as con:
         cur = con.cursor()
@@ -51,8 +51,8 @@ def shopkeeper():
 
         if request.method == "POST":
             cur.execute("""
-            INSERT INTO products (date, store, category, product, quantity, entered_by)
-            VALUES (%s,%s,%s,%s,%s,%s)
+                INSERT INTO products (date, store, category, product, quantity, entered_by)
+                VALUES (%s,%s,%s,%s,%s,%s)
             """, (
                 datetime.now(),
                 request.form["store"],
@@ -62,23 +62,26 @@ def shopkeeper():
                 request.form["entered_by"]
             ))
             con.commit()
+            return redirect(url_for("shopkeeper", store=request.form["store"]))
 
         cur.execute("SELECT name FROM stores ORDER BY name")
-        stores = cur.fetchall()
+        stores = [s[0] for s in cur.fetchall()]
 
         cur.execute("SELECT name FROM categories ORDER BY name")
-        categories = cur.fetchall()
+        categories = [c[0] for c in cur.fetchall()]
 
         if selected_store:
             cur.execute("""
                 SELECT id, date, store, category, product, quantity, entered_by
-                FROM products WHERE store=%s
+                FROM products
+                WHERE store=%s
                 ORDER BY date DESC
             """, (selected_store,))
         else:
             cur.execute("""
                 SELECT id, date, store, category, product, quantity, entered_by
-                FROM products ORDER BY date DESC
+                FROM products
+                ORDER BY date DESC
             """)
 
         products = cur.fetchall()
@@ -99,19 +102,21 @@ def supervisor():
     with db() as con:
         cur = con.cursor()
 
-        cur.execute("SELECT DISTINCT category FROM products ORDER BY category")
+        cur.execute("SELECT name FROM categories ORDER BY name")
         categories = [c[0] for c in cur.fetchall()]
 
-        if selected_category:
+        if selected_category and selected_category != "All":
             cur.execute("""
                 SELECT id, date, store, category, product, quantity, entered_by
-                FROM products WHERE category=%s
+                FROM products
+                WHERE category=%s
                 ORDER BY date DESC
             """, (selected_category,))
         else:
             cur.execute("""
                 SELECT id, date, store, category, product, quantity, entered_by
-                FROM products ORDER BY date DESC
+                FROM products
+                ORDER BY date DESC
             """)
 
         products = cur.fetchall()
@@ -120,15 +125,53 @@ def supervisor():
         "supervisor.html",
         products=products,
         categories=categories,
-        selected_category=selected_category
+        selected_category=selected_category or "All"
+    )
+
+# ---------- EDIT PRODUCT ----------
+@app.route("/edit/<int:product_id>", methods=["GET", "POST"])
+def edit_product(product_id):
+    with db() as con:
+        cur = con.cursor()
+
+        if request.method == "POST":
+            cur.execute("""
+                UPDATE products
+                SET store=%s, category=%s, product=%s, quantity=%s, entered_by=%s
+                WHERE id=%s
+            """, (
+                request.form["store"],
+                request.form["category"],
+                request.form["product"],
+                request.form["quantity"],
+                request.form["entered_by"],
+                product_id
+            ))
+            con.commit()
+            return redirect(url_for("supervisor"))
+
+        cur.execute("SELECT * FROM products WHERE id=%s", (product_id,))
+        product = cur.fetchone()
+
+        cur.execute("SELECT name FROM stores ORDER BY name")
+        stores = [s[0] for s in cur.fetchall()]
+
+        cur.execute("SELECT name FROM categories ORDER BY name")
+        categories = [c[0] for c in cur.fetchall()]
+
+    return render_template(
+        "edit.html",
+        product=product,
+        stores=stores,
+        categories=categories
     )
 
 # ---------- DELETE PRODUCT ----------
-@app.route("/delete-product/<int:pid>")
-def delete_product(pid):
+@app.route("/delete/<int:product_id>")
+def delete_product(product_id):
     with db() as con:
         cur = con.cursor()
-        cur.execute("DELETE FROM products WHERE id=%s", (pid,))
+        cur.execute("DELETE FROM products WHERE id=%s", (product_id,))
         con.commit()
     return redirect(url_for("supervisor"))
 
@@ -140,6 +183,24 @@ def clear_inventory():
         cur.execute("DELETE FROM products")
         con.commit()
     return redirect(url_for("supervisor"))
+
+# ---------- STORES ----------
+@app.route("/stores", methods=["GET", "POST"])
+def manage_stores():
+    with db() as con:
+        cur = con.cursor()
+
+        if request.method == "POST":
+            cur.execute(
+                "INSERT INTO stores (name) VALUES (%s) ON CONFLICT DO NOTHING",
+                (request.form["name"],)
+            )
+            con.commit()
+
+        cur.execute("SELECT name FROM stores ORDER BY name")
+        stores = [s[0] for s in cur.fetchall()]
+
+    return render_template("stores.html", stores=stores)
 
 # ---------- CATEGORIES ----------
 @app.route("/categories", methods=["GET", "POST"])
@@ -154,19 +215,16 @@ def manage_categories():
             )
             con.commit()
 
-        cur.execute("SELECT id, name FROM categories ORDER BY name")
-        categories = cur.fetchall()
+        cur.execute("SELECT name FROM categories ORDER BY name")
+        categories = [c[0] for c in cur.fetchall()]
 
     return render_template("categories.html", categories=categories)
 
 # ---------- DELETE CATEGORY ----------
-@app.route("/delete-category/<int:cid>")
-def delete_category(cid):
+@app.route("/delete-category/<category>")
+def delete_category(category):
     with db() as con:
         cur = con.cursor()
-        cur.execute("DELETE FROM categories WHERE id=%s", (cid,))
+        cur.execute("DELETE FROM categories WHERE name=%s", (category,))
         con.commit()
     return redirect(url_for("manage_categories"))
-
-if __name__ == "__main__":
-    app.run(debug=True)
