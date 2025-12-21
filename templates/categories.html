@@ -1,14 +1,58 @@
-<h1>Manage Categories</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Categories</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+        }
+        th, td {
+            border: 1px solid #999;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+        }
+        a {
+            text-decoration: none;
+            color: red;
+        }
+    </style>
+</head>
+<body>
 
-<form method="POST">
-New Category: <input name="name">
-<button>Add</button>
+<h2>Manage Categories</h2>
+
+<form method="post">
+    <input type="text" name="name" placeholder="New Category" required>
+    <button type="submit">Add Category</button>
 </form>
 
-<ul>
-{% for c in categories %}
-<li>{{ c[0] }}</li>
-{% endfor %}
-</ul>
+<br>
 
-<a href="/">Back to Shopkeeper</a>
+<table>
+    <tr>
+        <th>Category Name</th>
+        <th>Action</th>
+    </tr>
+
+    {% for c in categories %}
+    <tr>
+        <td>{{ c[0] }}</td>
+        <td>
+            <a href="/delete-category/{{ c[0] }}"
+               onclick="return confirm('Delete this category?')">
+               ❌ Delete
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="/">⬅ Back to Shopkeeper</a>
+
+</body>
+</html>
