@@ -1,16 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Product</title>
+</head>
+<body>
+
 <h2>Edit Product</h2>
 
 <form method="post">
+    <label>Store:</label>
+    <select name="store">
+        {% for s in stores %}
+            <option value="{{ s }}" {% if s == product[1] %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label>Category:</label>
     <select name="category">
         {% for c in categories %}
-        <option {% if c == product[1] %}selected{% endif %}>{{ c }}</option>
+            <option value="{{ c }}" {% if c == product[2] %}selected{% endif %}>{{ c }}</option>
         {% endfor %}
-    </select>
+    </select><br><br>
 
-    <input name="product" value="{{ product[2] }}">
-    <input name="quantity" type="number" value="{{ product[3] }}">
+    <label>Product:</label>
+    <input type="text" name="product" value="{{ product[3] }}" required><br><br>
 
-    <button>Update</button>
+    <label>Quantity:</label>
+    <input type="number" name="quantity" value="{{ product[4] }}" required><br><br>
+
+    <label>Entered By:</label>
+    <input type="text" name="entered_by" value="{{ product[5] }}" required><br><br>
+
+    <button type="submit">Update</button>
 </form>
 
-<a href="/supervisor">Back</a>
+<br>
+<a href="/supervisor">⬅ Back to Supervisor</a>
+
+</body>
+</html>
