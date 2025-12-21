@@ -7,9 +7,9 @@
 
 <h2>Manage Categories</h2>
 
-<form method="post">
-    <input type="text" name="name" placeholder="New category" required>
-    <button type="submit">Add</button>
+<form method="POST">
+    <input type="text" name="name" placeholder="New Category" required>
+    <button type="submit">Add Category</button>
 </form>
 
 <br>
@@ -19,11 +19,12 @@
         <th>Category</th>
         <th>Action</th>
     </tr>
+
     {% for c in categories %}
     <tr>
-        <td>{{ c[1] }}</td>
+        <td>{{ c }}</td>
         <td>
-            <a href="{{ url_for('delete_category', cid=c[0]) }}"
+            <a href="{{ url_for('delete_category', category=c) }}"
                onclick="return confirm('Delete this category?')">
                ❌ Delete
             </a>
@@ -33,7 +34,8 @@
 </table>
 
 <br>
-<a href="/">← Back to Shopkeeper</a>
+
+<a href="{{ url_for('shopkeeper') }}">← Back to Shopkeeper</a>
 
 </body>
 </html>
