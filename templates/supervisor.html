@@ -6,12 +6,12 @@
         table { border-collapse: collapse; width: 100%; }
         th, td { border: 1px solid #999; padding: 8px; text-align: center; }
         th { background: #eee; }
-        a { text-decoration: none; color: red; }
+        a { text-decoration: none; margin: 0 5px; }
     </style>
 </head>
 <body>
 
-<h2>Supervisor Inventory View</h2>
+<h2>Supervisor Inventory</h2>
 
 <form method="get" action="/supervisor">
     <label>Filter by Category:</label>
@@ -36,7 +36,7 @@
         <th>Product</th>
         <th>Qty</th>
         <th>Entered By</th>
-        <th>Action</th>
+        <th>Actions</th>
     </tr>
 
     {% for p in products %}
@@ -48,9 +48,8 @@
         <td>{{ p[5] }}</td>
         <td>{{ p[6] }}</td>
         <td>
-            <a href="/delete/{{ p[0] }}" onclick="return confirm('Delete this item?')">
-                ❌ Delete
-            </a>
+            <a href="/edit/{{ p[0] }}">✏ Edit</a>
+            <a href="/delete/{{ p[0] }}" onclick="return confirm('Delete this item?')">❌ Delete</a>
         </td>
     </tr>
     {% endfor %}
@@ -58,12 +57,8 @@
 
 <br>
 
-<a href="/clear-all" onclick="return confirm('Delete ALL products?')">
-    🧹 Clear All Inventory
-</a>
-
+<a href="/clear-all" onclick="return confirm('Delete ALL products?')">🧹 Clear All Inventory</a>
 <br><br>
-
 <a href="/">⬅ Back to Shopkeeper</a>
 
 </body>
