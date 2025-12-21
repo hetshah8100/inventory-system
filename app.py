@@ -44,6 +44,8 @@ init_db()
 # ---------- SHOPKEEPER ----------
 @app.route("/", methods=["GET", "POST"])
 def shopkeeper():
+    selected_store = request.args.get("store")
+
     with db() as con:
         cur = con.cursor()
 
@@ -60,25 +62,36 @@ def shopkeeper():
                 request.form["entered_by"]
             ))
             con.commit()
+            return redirect(url_for("shopkeeper", store=request.form["store"]))
 
         cur.execute("SELECT name FROM stores ORDER BY name")
-        stores = cur.fetchall()
+        stores = [s[0] for s in cur.fetchall()]
 
         cur.execute("SELECT name FROM categories ORDER BY name")
-        categories = cur.fetchall()
+        categories = [c[0] for c in cur.fetchall()]
 
-        cur.execute("""
-            SELECT id, date, store, category, product, quantity, entered_by
-            FROM products
-            ORDER BY date DESC
-        """)
+        if selected_store:
+            cur.execute("""
+                SELECT id, date, store, category, product, quantity, entered_by
+                FROM products
+                WHERE store = %s
+                ORDER BY date DESC
+            """, (selected_store,))
+        else:
+            cur.execute("""
+                SELECT id, date, store, category, product, quantity, entered_by
+                FROM products
+                ORDER BY date DESC
+            """)
+
         products = cur.fetchall()
 
     return render_template(
         "index.html",
         stores=stores,
         categories=categories,
-        products=products
+        products=products,
+        selected_store=selected_store
     )
 
 # ---------- STORES ----------
@@ -147,6 +160,48 @@ def supervisor():
         products=products,
         categories=categories,
         selected_category=selected_category
+    )
+
+# ---------- EDIT PRODUCT ----------
+@app.route("/edit/<int:product_id>", methods=["GET", "POST"])
+def edit_product(product_id):
+    with db() as con:
+        cur = con.cursor()
+
+        if request.method == "POST":
+            cur.execute("""
+                UPDATE products
+                SET store=%s, category=%s, product=%s, quantity=%s, entered_by=%s
+                WHERE id=%s
+            """, (
+                request.form["store"],
+                request.form["category"],
+                request.form["product"],
+                request.form["quantity"],
+                request.form["entered_by"],
+                product_id
+            ))
+            con.commit()
+            return redirect(url_for("supervisor"))
+
+        cur.execute("SELECT name FROM stores ORDER BY name")
+        stores = [s[0] for s in cur.fetchall()]
+
+        cur.execute("SELECT name FROM categories ORDER BY name")
+        categories = [c[0] for c in cur.fetchall()]
+
+        cur.execute("""
+            SELECT id, store, category, product, quantity, entered_by
+            FROM products
+            WHERE id = %s
+        """, (product_id,))
+        product = cur.fetchone()
+
+    return render_template(
+        "edit.html",
+        product=product,
+        stores=stores,
+        categories=categories
     )
 
 # ---------- DELETE PRODUCT ----------
