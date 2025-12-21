@@ -49,8 +49,8 @@ def shopkeeper():
 
         if request.method == "POST":
             cur.execute("""
-                INSERT INTO products (date, store, category, product, quantity, entered_by)
-                VALUES (%s,%s,%s,%s,%s,%s)
+            INSERT INTO products (date, store, category, product, quantity, entered_by)
+            VALUES (%s,%s,%s,%s,%s,%s)
             """, (
                 datetime.now(),
                 request.form["store"],
@@ -68,9 +68,9 @@ def shopkeeper():
         categories = cur.fetchall()
 
         cur.execute("""
-            SELECT date, store, category, product, quantity, entered_by
-            FROM products
-            ORDER BY date DESC
+        SELECT date, store, category, product, quantity, entered_by
+        FROM products
+        ORDER BY date DESC
         """)
         products = cur.fetchall()
 
@@ -99,14 +99,6 @@ def manage_stores():
 
     return render_template("stores.html", stores=stores)
 
-@app.route("/delete-store/<store_name>")
-def delete_store(store_name):
-    with db() as con:
-        cur = con.cursor()
-        cur.execute("DELETE FROM stores WHERE name = %s", (store_name,))
-        con.commit()
-    return redirect(url_for("manage_stores"))
-
 # ---------- CATEGORIES ----------
 @app.route("/categories", methods=["GET", "POST"])
 def manage_categories():
@@ -125,12 +117,17 @@ def manage_categories():
 
     return render_template("categories.html", categories=categories)
 
+# ---------- DELETE CATEGORY ----------
 @app.route("/delete-category/<category_name>")
 def delete_category(category_name):
     with db() as con:
         cur = con.cursor()
+
+        # Optional: also delete products of this category
+        cur.execute("DELETE FROM products WHERE category = %s", (category_name,))
         cur.execute("DELETE FROM categories WHERE name = %s", (category_name,))
         con.commit()
+
     return redirect(url_for("manage_categories"))
 
 # ---------- SUPERVISOR ----------
