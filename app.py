@@ -79,7 +79,7 @@ def shopkeeper():
             cur.execute("""
             SELECT date, category, product, quantity, entered_by
             FROM products
-            WHERE store = %s
+            WHERE store=%s
             ORDER BY date DESC
             """, (selected_store,))
             products = cur.fetchall()
@@ -95,7 +95,7 @@ def shopkeeper():
 # ------------------ SUPERVISOR ------------------
 @app.route("/supervisor")
 def supervisor():
-    selected_category = request.args.get("category")
+    selected_category = request.args.get("category", "All")
 
     with db() as con:
         cur = con.cursor()
@@ -103,11 +103,11 @@ def supervisor():
         cur.execute("SELECT name FROM categories ORDER BY name")
         categories = [c[0] for c in cur.fetchall()]
 
-        if selected_category and selected_category != "All":
+        if selected_category != "All":
             cur.execute("""
             SELECT id, date, store, category, product, quantity, entered_by
             FROM products
-            WHERE category = %s
+            WHERE category=%s
             ORDER BY date DESC
             """, (selected_category,))
         else:
@@ -123,7 +123,7 @@ def supervisor():
         "supervisor.html",
         products=products,
         categories=categories,
-        selected_category=selected_category or "All"
+        selected_category=selected_category
     )
 
 # ------------------ EDIT PRODUCT ------------------
@@ -135,9 +135,10 @@ def edit_product(pid):
         if request.method == "POST":
             cur.execute("""
             UPDATE products
-            SET category=%s, product=%s, quantity=%s, entered_by=%s
+            SET store=%s, category=%s, product=%s, quantity=%s, entered_by=%s
             WHERE id=%s
             """, (
+                request.form["store"],
                 request.form["category"],
                 request.form["product"],
                 int(request.form["quantity"]),
@@ -147,13 +148,25 @@ def edit_product(pid):
             con.commit()
             return redirect(url_for("supervisor"))
 
-        cur.execute("SELECT * FROM products WHERE id=%s", (pid,))
+        cur.execute("""
+        SELECT id, store, category, product, quantity, entered_by
+        FROM products
+        WHERE id=%s
+        """, (pid,))
         product = cur.fetchone()
 
         cur.execute("SELECT name FROM categories ORDER BY name")
         categories = [c[0] for c in cur.fetchall()]
 
-    return render_template("edit.html", product=product, categories=categories)
+        cur.execute("SELECT name FROM stores ORDER BY name")
+        stores = [s[0] for s in cur.fetchall()]
+
+    return render_template(
+        "edit.html",
+        product=product,
+        categories=categories,
+        stores=stores
+    )
 
 # ------------------ DELETE PRODUCT ------------------
 @app.route("/delete/<int:pid>")
@@ -180,8 +193,10 @@ def manage_stores():
         cur = con.cursor()
 
         if request.method == "POST":
-            cur.execute("INSERT INTO stores (name) VALUES (%s) ON CONFLICT DO NOTHING",
-                        (request.form["name"],))
+            cur.execute(
+                "INSERT INTO stores (name) VALUES (%s) ON CONFLICT DO NOTHING",
+                (request.form["name"],)
+            )
             con.commit()
 
         cur.execute("SELECT name FROM stores ORDER BY name")
@@ -205,8 +220,10 @@ def manage_categories():
         cur = con.cursor()
 
         if request.method == "POST":
-            cur.execute("INSERT INTO categories (name) VALUES (%s) ON CONFLICT DO NOTHING",
-                        (request.form["name"],))
+            cur.execute(
+                "INSERT INTO categories (name) VALUES (%s) ON CONFLICT DO NOTHING",
+                (request.form["name"],)
+            )
             con.commit()
 
         cur.execute("SELECT name FROM categories ORDER BY name")
