@@ -92,10 +92,10 @@ def shopkeeper():
         selected_store=selected_store
     )
 
-# ------------------ SUPERVISOR ------------------
+# ------------------ SUPERVISOR (FIXED) ------------------
 @app.route("/supervisor")
 def supervisor():
-    selected_category = request.args.get("category", "All")
+    selected_category = request.args.get("category")
 
     with db() as con:
         cur = con.cursor()
@@ -103,19 +103,20 @@ def supervisor():
         cur.execute("SELECT name FROM categories ORDER BY name")
         categories = [c[0] for c in cur.fetchall()]
 
-        if selected_category != "All":
+        # ✅ FIX: treat empty or "All" as show everything
+        if not selected_category or selected_category == "All":
+            cur.execute("""
+            SELECT id, date, store, category, product, quantity, entered_by
+            FROM products
+            ORDER BY date DESC
+            """)
+        else:
             cur.execute("""
             SELECT id, date, store, category, product, quantity, entered_by
             FROM products
             WHERE category=%s
             ORDER BY date DESC
             """, (selected_category,))
-        else:
-            cur.execute("""
-            SELECT id, date, store, category, product, quantity, entered_by
-            FROM products
-            ORDER BY date DESC
-            """)
 
         products = cur.fetchall()
 
@@ -123,7 +124,7 @@ def supervisor():
         "supervisor.html",
         products=products,
         categories=categories,
-        selected_category=selected_category
+        selected_category=selected_category or "All"
     )
 
 # ------------------ EDIT PRODUCT ------------------
@@ -221,7 +222,7 @@ def manage_categories():
 
         if request.method == "POST":
             cur.execute(
-                "INSERT INTO categories (name) VALUES (%s) ON CONFLICT DO NOTHING",
+                "FINAL INSERT INTO categories (name) VALUES (%s) ON CONFLICT DO NOTHING",
                 (request.form["name"],)
             )
             con.commit()
