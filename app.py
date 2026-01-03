@@ -102,7 +102,6 @@ def supervisor():
         cur.execute("SELECT name FROM categories ORDER BY name")
         categories = [c[0] for c in cur.fetchall()]
 
-        # FIX: All / empty category should show everything
         if selected_category and selected_category != "All":
             cur.execute("""
                 SELECT id, date, store, category, product, quantity, entered_by
@@ -126,19 +125,29 @@ def supervisor():
         selected_category=selected_category or "All"
     )
 
-# ------------------ EDIT PRODUCT ------------------
+# ------------------ EDIT PRODUCT (FIXED) ------------------
 @app.route("/edit/<int:pid>", methods=["GET", "POST"])
 def edit_product(pid):
     with db() as con:
         cur = con.cursor()
 
+        # Fetch existing product
+        cur.execute("""
+            SELECT store
+            FROM products
+            WHERE id=%s
+        """, (pid,))
+        store = cur.fetchone()[0]
+
         if request.method == "POST":
             cur.execute("""
                 UPDATE products
-                SET store=%s, category=%s, product=%s, quantity=%s, entered_by=%s
+                SET category=%s,
+                    product=%s,
+                    quantity=%s,
+                    entered_by=%s
                 WHERE id=%s
             """, (
-                request.form["store"],
                 request.form["category"],
                 request.form["product"],
                 int(request.form["quantity"]),
@@ -158,14 +167,11 @@ def edit_product(pid):
         cur.execute("SELECT name FROM categories ORDER BY name")
         categories = [c[0] for c in cur.fetchall()]
 
-        cur.execute("SELECT name FROM stores ORDER BY name")
-        stores = [s[0] for s in cur.fetchall()]
-
     return render_template(
         "edit.html",
         product=product,
         categories=categories,
-        stores=stores
+        store=store
     )
 
 # ------------------ DELETE PRODUCT ------------------
@@ -177,7 +183,7 @@ def delete_product(pid):
         con.commit()
     return redirect(url_for("supervisor"))
 
-# ------------------ CLEAR INVENTORY (FIXED) ------------------
+# ------------------ CLEAR INVENTORY ------------------
 @app.route("/clear-inventory")
 def clear_inventory():
     with db() as con:
@@ -195,7 +201,7 @@ def manage_stores():
         if request.method == "POST":
             cur.execute(
                 "INSERT INTO stores (name) VALUES (%s) ON CONFLICT DO NOTHING",
-                (request.form["name"],)
+                (request.form["store"],)
             )
             con.commit()
 
