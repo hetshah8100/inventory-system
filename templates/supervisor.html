@@ -7,13 +7,19 @@
 
 <h2>Supervisor Inventory</h2>
 
-<!-- FILTER (NO BUTTON, AUTO SUBMIT) -->
+<!-- NAVIGATION LINKS -->
+<p>
+    <a href="{{ url_for('manage_categories') }}">📂 Manage Categories</a> |
+    <a href="{{ url_for('manage_stores') }}">🏬 Manage Stores</a>
+</p>
+
+<hr>
+
+<!-- CATEGORY FILTER (AUTO APPLY, NO BUTTON) -->
 <form method="get" action="{{ url_for('supervisor') }}">
     <label>Filter by Category:</label>
     <select name="category" onchange="this.form.submit()">
-        <option value="All" {% if selected_category == "All" %}selected{% endif %}>
-            All
-        </option>
+        <option value="All" {% if selected_category == "All" %}selected{% endif %}>All</option>
         {% for c in categories %}
         <option value="{{ c }}" {% if selected_category == c %}selected{% endif %}>
             {{ c }}
@@ -47,9 +53,7 @@
             <a href="{{ url_for('edit_product', pid=p[0]) }}">✏️ Edit</a>
             |
             <a href="{{ url_for('delete_product', pid=p[0]) }}"
-               onclick="return confirm('Delete this product?')">
-               ❌ Delete
-            </a>
+               onclick="return confirm('Delete this product?')">❌ Delete</a>
         </td>
     </tr>
     {% endfor %}
@@ -57,7 +61,8 @@
 
 <br>
 
-<a href="{{ url_for('clear_inventory') }}">🧹 Clear All Inventory</a>
+<a href="{{ url_for('clear_inventory') }}"
+   onclick="return confirm('Clear all inventory?')">🧹 Clear All Inventory</a>
 
 <br><br>
 
