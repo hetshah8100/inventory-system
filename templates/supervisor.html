@@ -1,29 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Supervisor Panel</title>
+    <title>Supervisor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
 </head>
 <body>
 
-<h2>Supervisor Inventory</h2>
+<h2>Supervisor Dashboard</h2>
 
-<!-- NAVIGATION LINKS -->
-<p>
-  <a href="{{ url_for('manage_categories') }}">📂 Manage Categories</a>
-  &nbsp; | &nbsp;
-  <a href="{{ url_for('manage_stores') }}">🏬 Manage Stores</a>
-</p>
-<hr>
-
-<!-- CATEGORY FILTER (AUTO APPLY, NO BUTTON) -->
-<form method="get" action="{{ url_for('supervisor') }}">
-    <label>Filter by Category:</label>
+<!-- Filter -->
+<form method="get">
     <select name="category" onchange="this.form.submit()">
-        <option value="All" {% if selected_category == "All" %}selected{% endif %}>All</option>
+        <option value="All">All Categories</option>
         {% for c in categories %}
-        <option value="{{ c }}" {% if selected_category == c %}selected{% endif %}>
+        <option value="{{ c }}" {% if c == selected_category %}selected{% endif %}>
             {{ c }}
         </option>
         {% endfor %}
@@ -32,7 +22,16 @@
 
 <br>
 
-<table border="1" cellpadding="6">
+<a href="{{ url_for('clear_inventory') }}"
+   onclick="return confirm('Clear all inventory?')">
+   🧹 Clear All Inventory
+</a>
+
+<hr>
+
+<!-- DESKTOP TABLE -->
+<div class="desktop-only">
+<table border="1" cellpadding="6" width="100%">
     <tr>
         <th>Date</th>
         <th>Store</th>
@@ -40,35 +39,51 @@
         <th>Product</th>
         <th>Qty</th>
         <th>Entered By</th>
-        <th>Actions</th>
+        <th>Action</th>
     </tr>
 
     {% for p in products %}
     <tr>
-        <td>{{ p[1] }}</td>
+        <td>{{ p[1].strftime("%Y-%m-%d %H:%M") }}</td>
         <td>{{ p[2] }}</td>
         <td>{{ p[3] }}</td>
         <td>{{ p[4] }}</td>
         <td>{{ p[5] }}</td>
         <td>{{ p[6] }}</td>
         <td>
-            <a href="{{ url_for('edit_product', pid=p[0]) }}">✏️ Edit</a>
-            |
+            <a href="{{ url_for('edit_product', pid=p[0]) }}">✏️ Edit</a> |
             <a href="{{ url_for('delete_product', pid=p[0]) }}"
-               onclick="return confirm('Delete this product?')">❌ Delete</a>
+               onclick="return confirm('Delete this item?')">❌ Delete</a>
         </td>
     </tr>
     {% endfor %}
 </table>
+</div>
 
-<br>
+<!-- MOBILE CARDS -->
+<div class="mobile-only">
+{% for p in products %}
+<div class="card">
+    <strong>{{ p[4] }}</strong><br>
+    🏬 {{ p[2] }}<br>
+    🗂 {{ p[3] }}<br>
+    📦 Qty: {{ p[5] }}<br>
+    👤 {{ p[6] }}<br>
+    🕒 {{ p[1].strftime("%Y-%m-%d %H:%M") }}<br><br>
 
-<a href="{{ url_for('clear_inventory') }}"
-   onclick="return confirm('Clear all inventory?')">🧹 Clear All Inventory</a>
+    <a href="{{ url_for('edit_product', pid=p[0]) }}">✏️ Edit</a> |
+    <a href="{{ url_for('delete_product', pid=p[0]) }}"
+       onclick="return confirm('Delete this item?')">❌ Delete</a>
+</div>
+{% endfor %}
+</div>
 
-<br><br>
-
-<a href="{{ url_for('shopkeeper') }}">← Back to Shopkeeper</a>
+<!-- BOTTOM NAV (MOBILE ONLY) -->
+<div class="bottom-nav">
+    <a href="{{ url_for('shopkeeper') }}">Shopkeeper</a>
+    <a href="{{ url_for('manage_stores') }}">Stores</a>
+    <a href="{{ url_for('manage_categories') }}">Categories</a>
+</div>
 
 </body>
 </html>
