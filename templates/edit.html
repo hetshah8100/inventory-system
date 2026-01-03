@@ -9,9 +9,9 @@
 
 <form method="post">
 
-    <!-- Store (readonly + hidden so it submits) -->
+    <!-- Store (disabled visually, submitted via hidden input) -->
     <label>Store:</label>
-    <input type="text" value="{{ product[2] }}" readonly>
+    <input type="text" value="{{ product[2] }}" disabled>
     <input type="hidden" name="store" value="{{ product[2] }}">
     <br><br>
 
