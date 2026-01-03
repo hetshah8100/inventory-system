@@ -199,11 +199,14 @@ def manage_stores():
         cur = con.cursor()
 
         if request.method == "POST":
-            cur.execute(
-                "INSERT INTO stores (name) VALUES (%s) ON CONFLICT DO NOTHING",
-                (request.form["store"],)
-            )
-            con.commit()
+            name = request.form.get("name", "").strip()
+            if name:
+                cur.execute(
+                    "INSERT INTO stores (name) VALUES (%s) ON CONFLICT DO NOTHING",
+                    (name,)
+                )
+                con.commit()
+            return redirect(url_for("manage_stores"))
 
         cur.execute("SELECT name FROM stores ORDER BY name")
         stores = [s[0] for s in cur.fetchall()]
@@ -243,3 +246,4 @@ def delete_category(name):
         cur.execute("DELETE FROM categories WHERE name=%s", (name,))
         con.commit()
     return redirect(url_for("manage_categories"))
+
