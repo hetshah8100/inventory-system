@@ -1,1 +1,63 @@
+/* ---------- GLOBAL ---------- */
+body {
+  font-family: Arial, sans-serif;
+  margin: 12px;
+}
+
+/* Bottom nav hidden on desktop */
+.bottom-nav {
+  display: none;
+}
+
+/* Mobile/Desktop visibility helpers */
+.mobile-only { display: none; }
+.desktop-only { display: block; }
+
+/* ---------- MOBILE RULES ---------- */
+@media (max-width: 768px) {
+
+  /* Hide desktop tables, show mobile cards */
+  .desktop-only { display: none; }
+  .mobile-only { display: block; }
+
+  /* Bottom navigation */
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-top: 1px solid #ccc;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 1000;
+  }
+
+  .bottom-nav a {
+    text-decoration: none;
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+  }
+
+  /* Prevent nav overlap */
+  body {
+    padding-bottom: 70px;
+  }
+
+  /* Card style */
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #f9f9f9;
+  }
+
+  .card a {
+    text-decoration: none;
+    font-weight: bold;
+  }
+}
 
