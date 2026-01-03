@@ -9,14 +9,15 @@
 
 <form method="post">
 
+    <!-- Store (readonly + hidden so it submits) -->
     <label>Store:</label>
-    <select name="store" disabled>
-        <option selected>{{ product[2] }}</option>
-    </select>
+    <input type="text" value="{{ product[2] }}" readonly>
+    <input type="hidden" name="store" value="{{ product[2] }}">
     <br><br>
 
+    <!-- Category -->
     <label>Category:</label>
-    <select name="category">
+    <select name="category" required>
         {% for c in categories %}
         <option value="{{ c }}" {% if c == product[3] %}selected{% endif %}>
             {{ c }}
@@ -25,15 +26,17 @@
     </select>
     <br><br>
 
+    <!-- Product -->
     <label>Product:</label>
     <input type="text" name="product" value="{{ product[4] }}" required>
     <br><br>
 
-    <!-- ✅ FIX IS HERE -->
+    <!-- Quantity -->
     <label>Quantity:</label>
     <input type="number" name="quantity" value="{{ product[5] }}" required>
     <br><br>
 
+    <!-- Entered By -->
     <label>Entered By:</label>
     <input type="text" name="entered_by" value="{{ product[6] }}" required>
     <br><br>
