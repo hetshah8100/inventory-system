@@ -1,4 +1,4 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <title>Manage Stores</title>
@@ -7,34 +7,29 @@
 
 <h2>Manage Stores</h2>
 
-<!-- Add Store -->
-<form method="post">
-    <label>New Store:</label>
-    <input type="text" name="store" required>
+<form method="POST">
+    <input type="text" name="name" placeholder="New Store" required>
     <button type="submit">Add</button>
 </form>
 
 <br>
 
-<!-- Store List -->
 <ul>
     {% for s in stores %}
-    <li>
-        {{ s }}
-        &nbsp;
-        <a href="{{ url_for('delete_store', store=s) }}"
-           onclick="return confirm('Delete this store?')">
-           ❌ Delete
-        </a>
-    </li>
+        <li>
+            {{ s }}
+            &nbsp;
+            <a href="{{ url_for('delete_store', name=s) }}"
+               onclick="return confirm('Delete this store?')">
+               ❌ Delete
+            </a>
+        </li>
     {% endfor %}
 </ul>
 
 <br>
 
-<a href="{{ url_for('supervisor') }}">← Back to Supervisor</a><br>
-<a href="{{ url_for('shopkeeper') }}">← Back to Shopkeeper</a>
+<a href="{{ url_for('supervisor') }}">← Back to Supervisor</a>
 
 </body>
 </html>
-
