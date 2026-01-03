@@ -1,46 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Shopkeeper</title>
+    <title>Shopkeeper Inventory</title>
 </head>
 <body>
 
-<h1>Shopkeeper</h1>
+<h2>Shopkeeper Inventory Entry</h2>
 
-<form method="get">
-    <select name="store">
-        <option value="">Select Store</option>
-        {% for store in stores %}
-            <option value="{{ store }}" {% if store == selected_store %}selected{% endif %}>
-                {{ store }}
-            </option>
+<!-- STORE SELECT (AUTO LOAD, NO BUTTON) -->
+<form method="get" action="{{ url_for('shopkeeper') }}">
+    <label>Select Store:</label>
+    <select name="store" onchange="this.form.submit()">
+        <option value="">-- Select Store --</option>
+        {% for s in stores %}
+        <option value="{{ s }}" {% if selected_store == s %}selected{% endif %}>
+            {{ s }}
+        </option>
         {% endfor %}
     </select>
-    <button type="submit">Select</button>
+</form>
+
+<br>
+
+{% if selected_store %}
+<!-- PRODUCT ENTRY FORM -->
+<form method="post">
+    <input type="hidden" name="store" value="{{ selected_store }}">
+
+    <label>Category:</label>
+    <select name="category" required>
+        {% for c in categories %}
+        <option value="{{ c }}">{{ c }}</option>
+        {% endfor %}
+    </select>
+
+    <br><br>
+
+    <label>Product:</label>
+    <input type="text" name="product" required>
+
+    <br><br>
+
+    <label>Quantity:</label>
+    <input type="number" name="quantity" required>
+
+    <br><br>
+
+    <label>Entered By:</label>
+    <input type="text" name="entered_by" required>
+
+    <br><br>
+
+    <button type="submit">Add Product</button>
 </form>
 
 <hr>
 
-{% if selected_store %}
-<form method="post">
-    <input type="hidden" name="store" value="{{ selected_store }}">
+<h3>Recent Entries for {{ selected_store }}</h3>
 
-    <select name="category" required>
-        {% for cat in categories %}
-            <option value="{{ cat }}">{{ cat }}</option>
-        {% endfor %}
-    </select>
-
-    <input type="text" name="product" placeholder="Product" required>
-    <input type="number" name="quantity" placeholder="Qty" required>
-    <input type="text" name="entered_by" placeholder="Entered by" required>
-
-    <button type="submit">Add</button>
-</form>
-
-<h3>{{ selected_store }} Inventory</h3>
-
-<table border="1" cellpadding="5">
+<table border="1" cellpadding="6">
     <tr>
         <th>Date</th>
         <th>Category</th>
@@ -51,21 +69,19 @@
 
     {% for p in products %}
     <tr>
-        <td>{{ p[0] }}</td>   <!-- date -->
-        <td>{{ p[1] }}</td>   <!-- category -->
-        <td>{{ p[2] }}</td>   <!-- product -->
-        <td>{{ p[3] }}</td>   <!-- quantity -->
-        <td>{{ p[4] }}</td>   <!-- entered_by -->
+        <td>{{ p[0] }}</td>
+        <td>{{ p[1] }}</td>
+        <td>{{ p[2] }}</td>
+        <td>{{ p[3] }}</td>
+        <td>{{ p[4] }}</td>
     </tr>
     {% endfor %}
 </table>
 {% endif %}
 
-<hr>
+<br>
 
-<a href="/supervisor">Supervisor</a> |
-<a href="/stores">Manage Stores</a> |
-<a href="/categories">Manage Categories</a>
+<a href="{{ url_for('supervisor') }}">→ Go to Supervisor</a>
 
 </body>
 </html>
