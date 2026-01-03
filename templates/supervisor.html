@@ -2,36 +2,111 @@
 <html>
 <head>
     <title>Supervisor</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding-bottom: 70px; /* space for bottom nav */
+        }
+
+        h2 {
+            margin: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: center;
+        }
+
+        th {
+            background: #f0f0f0;
+        }
+
+        /* FILTER */
+        .filter-box {
+            padding: 10px;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            font-size: 15px;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 6px 10px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 13px;
+            color: white;
+        }
+
+        .edit { background: #007bff; }
+        .delete { background: #dc3545; }
+
+        .clear-btn {
+            display: block;
+            margin: 10px;
+            padding: 10px;
+            background: red;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        /* 🔽 BOTTOM NAV – ALWAYS VISIBLE */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #222;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .bottom-nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
 </head>
+
 <body>
 
-<h2>Supervisor Dashboard</h2>
+<h2>Supervisor</h2>
 
-<!-- Filter -->
-<form method="get">
-    <select name="category" onchange="this.form.submit()">
-        <option value="All">All Categories</option>
+<!-- FILTER (AUTO CHANGE, NO BUTTON) -->
+<div class="filter-box">
+    <select onchange="location = this.value;">
+        <option value="{{ url_for('supervisor') }}">All Categories</option>
         {% for c in categories %}
-        <option value="{{ c }}" {% if c == selected_category %}selected{% endif %}>
-            {{ c }}
-        </option>
+            <option value="{{ url_for('supervisor', category=c) }}"
+                {% if selected_category == c %}selected{% endif %}>
+                {{ c }}
+            </option>
         {% endfor %}
     </select>
-</form>
+</div>
 
-<br>
-
-<a href="{{ url_for('clear_inventory') }}"
-   onclick="return confirm('Clear all inventory?')">
-   🧹 Clear All Inventory
-</a>
-
-<hr>
-
-<!-- DESKTOP TABLE -->
-<div class="desktop-only">
-<table border="1" cellpadding="6" width="100%">
+<table>
     <tr>
         <th>Date</th>
         <th>Store</th>
@@ -44,41 +119,27 @@
 
     {% for p in products %}
     <tr>
-        <td>{{ p[1].strftime("%Y-%m-%d %H:%M") }}</td>
+        <td>{{ p[1] }}</td>
         <td>{{ p[2] }}</td>
         <td>{{ p[3] }}</td>
         <td>{{ p[4] }}</td>
         <td>{{ p[5] }}</td>
         <td>{{ p[6] }}</td>
         <td>
-            <a href="{{ url_for('edit_product', pid=p[0]) }}">✏️ Edit</a> |
-            <a href="{{ url_for('delete_product', pid=p[0]) }}"
-               onclick="return confirm('Delete this item?')">❌ Delete</a>
+            <a class="btn edit" href="{{ url_for('edit_product', pid=p[0]) }}">Edit</a>
+            <a class="btn delete" href="{{ url_for('delete_product', pid=p[0]) }}"
+               onclick="return confirm('Delete this item?')">Delete</a>
         </td>
     </tr>
     {% endfor %}
 </table>
-</div>
 
-<!-- MOBILE CARDS -->
-<div class="mobile-only">
-{% for p in products %}
-<div class="card">
-    <strong>{{ p[4] }}</strong><br>
-    🏬 {{ p[2] }}<br>
-    🗂 {{ p[3] }}<br>
-    📦 Qty: {{ p[5] }}<br>
-    👤 {{ p[6] }}<br>
-    🕒 {{ p[1].strftime("%Y-%m-%d %H:%M") }}<br><br>
+<a class="clear-btn" href="{{ url_for('clear_inventory') }}"
+   onclick="return confirm('Clear all inventory?')">
+   CLEAR ALL INVENTORY
+</a>
 
-    <a href="{{ url_for('edit_product', pid=p[0]) }}">✏️ Edit</a> |
-    <a href="{{ url_for('delete_product', pid=p[0]) }}"
-       onclick="return confirm('Delete this item?')">❌ Delete</a>
-</div>
-{% endfor %}
-</div>
-
-<!-- BOTTOM NAV (MOBILE ONLY) -->
+<!-- 🔽 BOTTOM NAVIGATION -->
 <div class="bottom-nav">
     <a href="{{ url_for('shopkeeper') }}">Shopkeeper</a>
     <a href="{{ url_for('manage_stores') }}">Stores</a>
